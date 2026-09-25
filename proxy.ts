@@ -57,13 +57,15 @@ function logRedirect(
 }
 
 export function proxy(request: NextRequest) {
-  const { hostname, nextUrl } = request;
+  const { nextUrl } = request;
+  const hostname = nextUrl.hostname;
 
   // Local development has no DNS for *.manojgowda.qzz.io, so a request
   // header can force a specific alias. This only applies on localhost and
   // never in production. The destination still comes from the allowlist.
   const alias =
-    devOverrideAlias(request) ?? parseHostname(hostname, BASE_DOMAIN).alias;
+    devOverrideAlias({ headers: request.headers, hostname }) ??
+    parseHostname(hostname, BASE_DOMAIN).alias;
 
   if (alias) {
     const destination = resolveDestination(alias, nextUrl.pathname);
