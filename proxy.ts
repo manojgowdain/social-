@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { REDIRECTS } from './config/redirects';
+import { REDIRECTS } from './src/config/redirects';
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   // Get hostname from request (e.g., github.manojgowda.qzz.io, manojgowda.qzz.io)
   let hostname = request.headers.get('host') || '';
   

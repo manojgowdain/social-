@@ -9,3 +9,5 @@ export const REDIRECTS = {
   projects: "https://manojgowda.in/projects",
   contact: "https://manojgowda.in/contact",
 } as const;
+
+export type Alias = keyof typeof REDIRECTS;
