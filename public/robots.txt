@@ -1,0 +1,20 @@
+# Manoj Gowda redirect service — robots.txt
+#
+# This application is a redirect service. Its only indexable, HTTP-200 page
+# is the fallback landing page. Every known subdomain alias (github,
+# linkedin, instagram, …) issues a server-side 308 redirect, so those URLs
+# must not be indexed as duplicate pages.
+#
+# The canonical source of all portfolio content is:
+#   https://manojgowda.in/
+
+User-agent: *
+Allow: /
+
+# Do not treat redirecting subdomains as crawlable content pages.
+Disallow: /api
+
+# The redirect service itself is crawl-friendly, but it must not pretend to
+# host duplicate portfolio content. Crawl the fallback page; the canonical
+# portfolio remains https://manojgowda.in/.
+Sitemap: https://manojgowda.qzz.io/sitemap.xml

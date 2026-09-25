@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Sitemap for the redirect service.
+
+  Only real, indexable pages are listed here. Redirecting subdomain aliases
+  are deliberately excluded — they are short entry points, not content
+  pages, and their canonical source is https://manojgowda.in/.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://manojgowda.qzz.io/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+</urlset>
