@@ -4,10 +4,8 @@ import { REDIRECTS } from './src/config/redirects';
 
 export function proxy(request: NextRequest) {
   // Get hostname from request (e.g., github.manojgowda.qzz.io, manojgowda.qzz.io)
-  let hostname = request.headers.get('host') || '';
-  
-  // Remove port if present (e.g. localhost:3000)
-  hostname = hostname.split(':')[0];
+  let hostname = request.nextUrl.hostname || '';
+  console.log("PROXY HIT! Hostname:", hostname);
 
   // Base domain to match
   const baseDomain = 'manojgowda.qzz.io';
@@ -15,7 +13,7 @@ export function proxy(request: NextRequest) {
 
   // If exact base domain or www, redirect to root manojgowda.in/
   if (hostname === baseDomain || hostname === `www.${baseDomain}`) {
-    return NextResponse.redirect(defaultDestination, 308);
+    return NextResponse.redirect(new URL(defaultDestination), { status: 308 });
   }
 
   // If it ends with .manojgowda.qzz.io, extract the subdomain
@@ -26,10 +24,10 @@ export function proxy(request: NextRequest) {
     if (subdomain in REDIRECTS) {
       const destination = REDIRECTS[subdomain as keyof typeof REDIRECTS];
       // Use 308 for permanent redirect
-      return NextResponse.redirect(destination, 308);
+      return NextResponse.redirect(new URL(destination), { status: 308 });
     } else {
       // Unknown subdomains redirect to the main portfolio page
-      return NextResponse.redirect(defaultDestination, 308);
+      return NextResponse.redirect(new URL(defaultDestination), { status: 308 });
     }
   }
 
