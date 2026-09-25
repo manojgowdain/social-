@@ -1,10 +1,12 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { REDIRECTS } from './src/config/redirects';
+import { REDIRECTS } from './config/redirects';
 
 export function proxy(request: NextRequest) {
   // Get hostname from request (e.g., github.manojgowda.qzz.io, manojgowda.qzz.io)
-  let hostname = request.nextUrl.hostname || '';
+  // Vercel forwards the correct host header. Fallback to nextUrl.hostname just in case.
+  let hostname = request.headers.get('host') || request.nextUrl.hostname || '';
+  hostname = hostname.split(':')[0]; // Remove port if present
   console.log("PROXY HIT! Hostname:", hostname);
 
   // Base domain to match
