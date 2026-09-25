@@ -1,7 +1,29 @@
 {
   "permissions": {
     "allow": [
-      "Bash(xargs grep -l \"class NextRequest\")"
+      "Bash(xargs grep -l \"class NextRequest\")",
+      "Bash(curl -sS -i -H \"Host: github.manojgowda.qzz.io\" http://localhost:3000/)",
+      "Bash(curl -sS -o /dev/null -w \"no-header: %{http_code} -> %{redirect_url}\\\\n\" http://localhost:3000/)",
+      "Bash(curl -sS -o /dev/null -w \"dev-override: %{http_code} -> %{redirect_url}\\\\n\" -H \"x-manoj-alias: github\" http://localhost:3000/)",
+      "Bash(curl -sS -o /dev/null -w \"dev-override+path: %{http_code} -> %{redirect_url}\\\\n\" -H \"x-manoj-alias: github\" http://localhost:3000/foo/bar)",
+      "Bash(curl -sS -o /dev/null -w \"whatsapp: %{http_code} -> %{redirect_url}\\\\n\" -H \"x-manoj-alias: whatsapp\" http://localhost:3000/)",
+      "Bash(curl -sS -o /dev/null -w \"unknown-alias: %{http_code} -> %{redirect_url}\\\\n\" -H \"x-manoj-alias: bogus\" http://localhost:3000/)",
+      "Read(//tmp/**)",
+      "Bash(curl -sS -i -H \"x-manoj-alias: github\" http://localhost:3000/)",
+      "Bash(xargs grep -l \"resolveDestination\\\\|devOverrideAlias\")",
+      "Bash(xargs grep -l \"devOverrideAlias\\\\|resolveDestination\")",
+      "Bash(python3 -m json.tool)",
+      "Bash(xxd)",
+      "Bash(echo \"build exit=$?\")",
+      "Bash(pkill -f \"next start\")",
+      "Bash(pkill -f \"next-server\")",
+      "Bash(npm run *)",
+      "Bash(curl -sS -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3000/)",
+      "Bash(tasklist /FI \"PID\")",
+      "Bash(netstat -ano)",
+      "Bash(taskkill /PID 8968 /F)",
+      "Bash(Stop-Process -Id 8968 -Force)",
+      "Bash(/taskkill /PID 8968 /F)"
     ]
   }
 }

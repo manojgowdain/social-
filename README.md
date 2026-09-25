@@ -1,75 +1,93 @@
-# socail
+# manojgowda.qzz.io Redirect Service
 
-A Next.js redirect service that maps short, memorable hostnames to Manoj Gowda's
-portfolio and professional links. Each subdomain of the base domain
-(`manojgowda.qzz.io`) is an alias that redirects (HTTP 308) to a section of the
-canonical site at [`manojgowda.in`](https://manojgowda.in).
+This is a Next.js App Router project that implements a **two-step redirect architecture**.
 
-## Aliases
+## Architecture Overview
 
-| Alias        | Destination                          |
-| ------------ | ------------------------------------ |
-| `github`     | `manojgowda.in/github`               |
-| `linkedin`   | `manojgowda.in/linkedin`             |
-| `instagram`  | `manojgowda.in/instagram`            |
-| `whatsapp`   | `wa.me/9513849323`                   |
-| `resume`     | `cdn.manojgowda.qzz.io/manojgowda.in.pdf` |
-| `skills`     | `manojgowda.in/skills`               |
-| `experience` | `manojgowda.in/experience`           |
-| `projects`   | `manojgowda.in/projects`             |
-| `contact`    | `manojgowda.in/contact`              |
+This project serves ONLY as an alias/link layer. It intercepts incoming requests to subdomains on `manojgowda.qzz.io` and redirects them to the canonical domain (`manojgowda.in`).
 
-Portfolio routes preserve the request path, e.g.
-`github.manojgowda.qzz.io/foo` → `https://manojgowda.in/github/foo`. Social
-links and the resume redirect to their plain root URL.
-
-Hostnames that are not a recognized alias (the bare root, `www`, or an unknown
-subdomain) serve a lightweight landing page pointing people at the canonical
-portfolio.
-
-## Repository layout
-
-```
-.
-├── proxy.ts                 # Next.js middleware that performs the redirects
-├── src/
-│   ├── app/                 # landing page + layout
-│   ├── config/redirects.ts  # alias → destination allowlist
-│   └── lib/hostname.ts      # hostname parsing & dev overrides
-├── next.config.mjs
-└── package.json
+```text
+┌─────────────────────────┐
+│ github.manojgowda.qzz.io│ (This project)
+└────────────┬────────────┘
+             │
+             ▼
+┌─────────────────────────┐
+│  manojgowda.in/github   │ (Canonical website)
+└────────────┬────────────┘
+             │
+             ▼
+┌─────────────────────────┐
+│ github.com/manojgowdain │ (External destination)
+└─────────────────────────┘
 ```
 
-## Getting started
+This ensures that the `qzz.io` domain is an alias/link layer, the main website is the canonical layer, and the external social platform is the final destination.
+
+## Required Redirect Mappings
+
+| Subdomain | Destination |
+| :--- | :--- |
+| `github.manojgowda.qzz.io` | `https://manojgowda.in/github` |
+| `linkedin.manojgowda.qzz.io` | `https://manojgowda.in/linkedin` |
+| `instagram.manojgowda.qzz.io` | `https://manojgowda.in/instagram` |
+| `whatsapp.manojgowda.qzz.io` | `https://manojgowda.in/contact` |
+| `resume.manojgowda.qzz.io` | `https://manojgowda.in/resume` |
+| `skills.manojgowda.qzz.io` | `https://manojgowda.in/skills` |
+| `experience.manojgowda.qzz.io` | `https://manojgowda.in/experience` |
+| `projects.manojgowda.qzz.io` | `https://manojgowda.in/projects` |
+| `contact.manojgowda.qzz.io` | `https://manojgowda.in/contact` |
+| `*.manojgowda.qzz.io` (unknown) | `https://manojgowda.in/` |
+| `manojgowda.qzz.io` | `https://manojgowda.in/` |
+| `www.manojgowda.qzz.io` | `https://manojgowda.in/` |
+
+**Security Note:**
+Redirection destinations are hardcoded. This application does not accept dynamic redirect destinations via URL parameters, preventing open redirect vulnerabilities.
+
+## Technical Implementation
+
+- **Next.js Middleware:** Used for parsing hostnames and returning HTTP 308 permanent redirects directly from the edge/server (`src/middleware.ts`). No client-side code is used for the redirection.
+- **Centralized Configuration:** The subdomain to destination mapping is stored in `src/config/redirects.ts`.
+
+## DNS Configuration
+
+To deploy this correctly, the following DNS records must be configured to point to this Next.js deployment:
+
+1. A wildcard record for subdomains: `*.manojgowda.qzz.io`
+2. The apex domain: `manojgowda.qzz.io`
+3. The www subdomain: `www.manojgowda.qzz.io`
+
+Ensure HTTPS/TLS is configured correctly for all these subdomains to avoid security warnings.
+
+## Deployment Instructions
+
+1. Configure DNS as detailed above.
+2. Build the project: `npm run build`
+3. Start the server: `npm start` (Or deploy via Vercel/Netlify/etc.)
+
+## Testing
+
+After deployment, test every subdomain using `curl`:
 
 ```bash
-npm install
-npm run dev
+curl -I https://github.manojgowda.qzz.io
+curl -I https://linkedin.manojgowda.qzz.io
+curl -I https://instagram.manojgowda.qzz.io
+curl -I https://whatsapp.manojgowda.qzz.io
+curl -I https://resume.manojgowda.qzz.io
+curl -I https://skills.manojgowda.qzz.io
+curl -I https://experience.manojgowda.qzz.io
+curl -I https://projects.manojgowda.qzz.io
+curl -I https://contact.manojgowda.qzz.io
+curl -I https://unknown.manojgowda.qzz.io
+curl -I https://manojgowda.qzz.io
+curl -I https://www.manojgowda.qzz.io
 ```
 
-Open [http://localhost:3000](http://localhost:3000). During local development,
-`*.manojgowda.qzz.io` does not resolve, so a request header can force a
-specific alias (see [`src/lib/hostname.ts`](src/lib/hostname.ts)) — this only
-applies on localhost and never in production, and the destination still comes
-from the allowlist.
-
-## Configuration
-
-The base domain and canonical URL are set via environment variables:
-
-```env
-NEXT_PUBLIC_CANONICAL_URL=https://manojgowda.in
-REDIRECT_BASE_DOMAIN=manojgowda.qzz.io
+**Expected Output:**
+You should see a `308 Permanent Redirect` with the `Location` header pointing to the correct `https://manojgowda.in/` path.
+Example:
 ```
-
-See [`.env.example`](.env.example) for the full set.
-
-## Deploy
-
-```bash
-npm run build
-npm start
+HTTP/2 308
+location: https://manojgowda.in/github
 ```
-
-The redirect logic lives entirely in the `proxy` middleware, so the service can
-run behind any HTTP front end (Vercel, a VPS, or a reverse proxy).
